@@ -29,7 +29,7 @@ def index():
     conn.close()
 
     # Renderizar la plantilla con productos y carrito
-    return render_template('index.html', products=products, cart_items=cart_items, total=total)
+    return render_template('index.html', products=products, cart_items=cart_items, total=total , cart=request.args.get('cart')== 'true')
 
 
 @app.route('/add_to_cart/<int:product_id>', methods=['POST'])
@@ -63,7 +63,13 @@ def update_cart(cart_id):
     if action == 'increase':
         conn.execute('UPDATE cart SET quantity = quantity + 1 WHERE id = ?', (cart_id,))
     elif action == 'decrease':
-        conn.execute('UPDATE cart SET quantity = quantity - 1 WHERE id = ? AND quantity > 1', (cart_id,))
+        # Disminuye la cantidad si es mayor a 1 sino elimina el producto
+        # del carrito
+        if conn.execute('SELECT quantity FROM cart WHERE id = ?', (cart_id,)).fetchone()['quantity'] > 1:
+            conn.execute('UPDATE cart SET quantity = quantity - 1 WHERE id = ? AND quantity > 1', (cart_id,))
+        else:
+            conn.execute('DELETE FROM cart WHERE id = ?', (cart_id,))
+
     elif action == 'remove':
         conn.execute('DELETE FROM cart WHERE id = ?', (cart_id,))
     
@@ -71,7 +77,7 @@ def update_cart(cart_id):
     conn.close()
 
     # Redirige al carrito sin cambiar a la página principal
-    return redirect(url_for('index'))  # Mantiene el carrito en la vista actual
+    return  redirect(url_for('index') + '?cart=true')  # Mantiene el carrito en la vista actual
 
 @app.route('/checkout', methods=['POST'])
 def checkout():

@@ -6,7 +6,7 @@
   <title>Plataforma de Alimentos Saludables</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body class="{{ 'show-cart' if request.args.get('cart') else 'show-home' }}">
   <header>
     <h1>Plataforma de Alimentos Saludables</h1>
     <nav>
@@ -40,12 +40,12 @@
         {% if cart_items %}
           {% for item in cart_items %}
           <li>
-            <img src="{{ url_for('static', filename=item['image']) }}" alt="{{ item['name'] }}">
+            <img src="{{ url_for('static', filename=item['image']) }}" alt="{{ item['name'] }}" width="100px">
             {{ item['name'] }} - ${{ item['price'] }} x {{ item['quantity'] }}
             <form action="{{ url_for('update_cart', cart_id=item['cart_id']) }}" method="POST">
-              <button name="action" value="increase">+</button>
-              <button name="action" value="decrease">-</button>
-              <button name="action" value="remove">Eliminar</button>
+              <button type="submit" name="action" value="increase">+</button>
+              <button type="submit" name="action" value="decrease">-</button>
+              <button type="submit" name="action" value="remove">Eliminar</button>
             </form>
           </li>
           {% endfor %}
@@ -70,10 +70,20 @@
   </main>
 
   <script>
+    // Función para alternar entre las secciones de Inicio y Carrito
     function showSection(section) {
       document.getElementById('home').style.display = section === 'home' ? 'block' : 'none';
       document.getElementById('cart').style.display = section === 'cart' ? 'block' : 'none';
     }
+
+    // Detecta si se accede directamente a la página del carrito (por ejemplo, después de actualizar)
+    window.onload = function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const showCart = urlParams.get('cart'); // Verifica si 'cart=true' está en la URL
+      if (showCart) {
+        showSection('cart'); // Muestra la sección de carrito
+      }
+    };
   </script>
 </body>
 </html>
