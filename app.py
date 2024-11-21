@@ -73,7 +73,6 @@ def update_cart(cart_id):
     # Redirige al carrito sin cambiar a la página principal
     return redirect(url_for('index'))  # Mantiene el carrito en la vista actual
 
-
 @app.route('/checkout', methods=['POST'])
 def checkout():
     first_name = request.form['first-name']
@@ -85,32 +84,27 @@ def checkout():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Guarda la orden
-    cursor.execute('''
-        INSERT INTO orders (first_name, last_name, phone, address, card)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (first_name, last_name, phone, address, card))
-    conn.commit()
+    # Obtener los ítems del carrito
+    cart_items = conn.execute('''SELECT product_id, quantity FROM cart''').fetchall()
 
-    order_id = cursor.lastrowid
-
-    # Obtén productos del carrito
-    cart_items = conn.execute('SELECT product_id, quantity FROM cart').fetchall()
-
-    # Inserta productos en order_items
+    # Insertar los datos de la orden en la tabla 'orders_complete'
     for item in cart_items:
+        # Obtener los detalles del producto
+        product = conn.execute('SELECT name, price, image FROM products WHERE id = ?', (item['product_id'],)).fetchone()
         cursor.execute('''
-            INSERT INTO order_items (order_id, product_id, quantity)
-            VALUES (?, ?, ?)
-        ''', (order_id, item['product_id'], item['quantity']))
+            INSERT INTO orders_complete (first_name, last_name, phone, address, card, product_name, product_price, product_image, quantity)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (first_name, last_name, phone, address, card, product['name'], product['price'], product['image'], item['quantity']))
+
     conn.commit()
 
-    # Limpia el carrito
+    # Limpiar el carrito después de la compra
     conn.execute('DELETE FROM cart')
     conn.commit()
     conn.close()
 
     return redirect(url_for('index'))
+
 
 
 if __name__ == '__main__':

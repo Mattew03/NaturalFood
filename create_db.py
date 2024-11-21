@@ -26,25 +26,17 @@ CREATE TABLE IF NOT EXISTS cart (
 
 # Crear la tabla de órdenes si no existe
 cursor.execute('''
-CREATE TABLE IF NOT EXISTS orders (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE IF NOT EXISTS orders_complete (
+    order_id INTEGER PRIMARY KEY AUTOINCREMENT,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     phone TEXT NOT NULL,
     address TEXT NOT NULL,
-    card TEXT NOT NULL
-)
-''')
-
-# Crear la tabla de ítems de órdenes si no existe
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS order_items (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    order_id INTEGER NOT NULL,
-    product_id INTEGER NOT NULL,
-    quantity INTEGER NOT NULL DEFAULT 1,
-    FOREIGN KEY (order_id) REFERENCES orders (id),
-    FOREIGN KEY (product_id) REFERENCES products (id)
+    card TEXT NOT NULL,
+    product_name TEXT NOT NULL,
+    product_price REAL NOT NULL,
+    product_image TEXT NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 1
 )
 ''')
 
@@ -57,13 +49,6 @@ if cursor.fetchone()[0] == 0:
         ('Té de Manzanilla', 10.00, 'images/botanico.jpg')
     ]
     cursor.executemany('INSERT INTO products (name, price, image) VALUES (?, ?, ?)', products)
-
-
-# Verificar y agregar columna 'quantity' en order_items si no existe
-cursor.execute("PRAGMA table_info(order_items)")
-columns = [column[1] for column in cursor.fetchall()]
-if 'quantity' not in columns:
-    cursor.execute('ALTER TABLE order_items ADD COLUMN quantity INTEGER DEFAULT 1')
 
 # Confirmar los cambios y cerrar la conexión
 conn.commit()
