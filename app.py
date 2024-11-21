@@ -75,14 +75,23 @@ def update_cart(cart_id):
 
 @app.route('/checkout', methods=['POST'])
 def checkout():
+    # Obtener los datos del usuario del formulario
     first_name = request.form['first-name']
     last_name = request.form['last-name']
     phone = request.form['phone']
     address = request.form['address']
     card = request.form['card']
 
+    # Conexión a la base de datos
     conn = get_db_connection()
     cursor = conn.cursor()
+
+    # Insertar los datos del usuario en la nueva tabla 'user_data'
+    cursor.execute('''
+        INSERT INTO user_data (first_name, last_name, phone, address, card)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (first_name, last_name, phone, address, card))
+    conn.commit()
 
     # Obtener los ítems del carrito
     cart_items = conn.execute('''SELECT product_id, quantity FROM cart''').fetchall()
@@ -104,6 +113,7 @@ def checkout():
     conn.close()
 
     return redirect(url_for('index'))
+
 
 
 

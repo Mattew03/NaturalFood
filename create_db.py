@@ -24,6 +24,17 @@ CREATE TABLE IF NOT EXISTS cart (
 )
 ''')
 
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS user_data (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    address TEXT NOT NULL,
+    card TEXT NOT NULL
+)
+''')
+
 # Crear la tabla de órdenes si no existe
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS orders_complete (
