@@ -55,9 +55,9 @@ CREATE TABLE IF NOT EXISTS orders_complete (
 cursor.execute('SELECT COUNT(*) FROM products')
 if cursor.fetchone()[0] == 0:
     products = [
-        ('Bebida Energética', 5.00, 'images/bebida.jpg'),
-        ('Chía Orgánica', 8.00, 'images/superfood.jpg'),
-        ('Té de Manzanilla', 10.00, 'images/botanico.jpg')
+        ('Bebida Energética', 5.00, 'https://imagenes-productos-web.s3.us-east-1.amazonaws.com/bebida.jpg'),
+        ('Chía Orgánica', 8.00, 'https://imagenes-productos-web.s3.us-east-1.amazonaws.com/botanico.jpg'),
+        ('Té de Manzanilla', 10.00, 'https://imagenes-productos-web.s3.us-east-1.amazonaws.com/superfood.jpg')
     ]
     cursor.executemany('INSERT INTO products (name, price, image) VALUES (?, ?, ?)', products)
 

@@ -63,13 +63,7 @@ def update_cart(cart_id):
     if action == 'increase':
         conn.execute('UPDATE cart SET quantity = quantity + 1 WHERE id = ?', (cart_id,))
     elif action == 'decrease':
-        # Disminuye la cantidad si es mayor a 1 sino elimina el producto
-        # del carrito
-        if conn.execute('SELECT quantity FROM cart WHERE id = ?', (cart_id,)).fetchone()['quantity'] > 1:
-            conn.execute('UPDATE cart SET quantity = quantity - 1 WHERE id = ? AND quantity > 1', (cart_id,))
-        else:
-            conn.execute('DELETE FROM cart WHERE id = ?', (cart_id,))
-
+        conn.execute('UPDATE cart SET quantity = quantity - 1 WHERE id = ? AND quantity > 1', (cart_id,))
     elif action == 'remove':
         conn.execute('DELETE FROM cart WHERE id = ?', (cart_id,))
     
